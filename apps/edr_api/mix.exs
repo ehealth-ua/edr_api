@@ -9,7 +9,7 @@ defmodule EdrApi.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.8",
+      elixir: "~> 1.8.1",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -18,16 +18,21 @@ defmodule EdrApi.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {EdrApi.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
-      # {:sibling_app_in_umbrella, in_umbrella: true}
+      {:kube_rpc, git: "https://github.com/edenlabllc/kube_rpc.git"},
+      {:confex, "~> 3.4"},
+      {:httpoison, "~> 1.2"},
+      {:jason, "~> 1.1"},
+      {:confex_config_provider, "~> 0.1.0"},
+      {:mox, "~> 0.4.0", only: :test},
+      {:ex_machina, "~> 2.2", only: :test}
     ]
   end
 end
