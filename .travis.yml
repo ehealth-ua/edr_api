@@ -1,0 +1,50 @@
+language: elixir
+git:
+  depth: 1000
+cache:
+  directories:
+    - _build
+    - deps
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+elixir:
+  - 1.8.1
+otp_release:
+  - 21.2.5
+notifications:
+  slack:
+    rooms:
+      - secure: "LRTw3OmfAQqoXJgXkXTdNP5r+qrfZuKMstSjOwzpiDYOvBHMZFwaJNVY/Szz3CreXo8Fz2QNeG0y00oSyWOBiHx6xKXPslVdnaED0jK3zXBn+Io8ajAYblIoAw4mPFhb33m7vPH93z3RuubaJF9XJkwc+s3o5TcVyUrz2YUFT6QhJW9Mia7x+2+b0rv/9P0hfbLyY8Mdpq23H014l+WxFA4lKRbL+igxFD2H8hiXnor1oXRJ5lLYcIMjQujoNIddOEJd49T1Pmd+xb+1cegy+FC49YoTT1949hGqGm1AZMULMSSCQvHCIrDwJ2eQ6rkjHIcqJ6QR+9xolCwRwWlpqwfHU/Zyyjs5CjE3fuSmZ9Z5y8eZfGOmLJMF4w2E5KnMyuqLh+7vKbQQtykJfwKhPRu77jjcHcypSHCEoy1qXLFQ39rHhZqNAaVYe2epvFgYCxiS+l8ThfIpQNxu+sSC63JOwN78atB6qfFrIh2ab/48LgGCLEKJcbwAslF/vs//LWe09VAayDUXOsr7trC1qDDCAQC9dtXdlC4YlkFp8KbsLNAUaUt5ZbMSfozlBm0fZmEnvmFgEOmkb2mpmcdvPxJoZWY+xkLTFYPSFvt2hjWpIU3cSg46TZQ/KRDWu338cJn6zODLfdUZpyInmGkFieAulqxoKNHGlpbmabDOd8Q="
+    on_success: always
+env:
+  global:
+    - NO_ECTO_SETUP=true
+    - MIX_ENV=test
+    - DOCKER_NAMESPACE=edenlabllc
+    - APPS='[{"app":"edr_api","chart":"edr-api","namespace":"edr","deployment":"api-edr","label":"api-edr"}]'
+    #Docker env's
+    - secure: "OGyA5DKG7X2YIfG9Arbj7u+9VjJ/hLvcPy7x7cVEtxa8eWbAaCGN1Q4BdluccOsMOWAhqtTDVy3CAhxcnyuvDMn3m5LksXyNDoe3USeWZOsN1QQVeJeNzs8aLSfyrwm1zkPTaCgwyc7+zMu7tpHnSgK2kiLj80D83a8GTE39+glICnHcJJ1cNHT/upliE4eUTQvEffeZU7qbdOaQTaLipdRyrSZVbwyHvDB9lhL8J5pfj8izSUb2cRxIIl7RoUda8hEAksWtYc9zdpXnuFtY53wIMaviUd/wclN13yQ+sqJXpjMu8fKv58RN0dMbugn1y0yZUjns4AEmKO7Qzo2DHR7MMBzWPIvddR5YJVKx4BtrHJXlT3ZY9gYwAnRpdK+AH7gsaWPxi1yPNYWKQZbnpeRaWsQF6XI/Lcyj5GtgoS1DWAXAWKBwhTiQPSVvkSxT6hlkoMgryweTidvJJrs8SNOrMQgIQnaCli1lYSyoRBk6Qj+noszJdo3nxlHPUrLXonDO2rcsQwKlEPt5rMZZfs5YgoSpO8bUBpYNzuAn7BYCicKLVZxUbCINjwYZ90aijF1ssgaB8eX45pRH5VG2Tltiyi2TfOG00xTSOD3bFdfPCs+d4fyhhjk4mCbuyAEvJDINMbb/7fLE5QGzG4ldXF4N6MGV9qN7ZIcK0o0WvZI="
+branches:
+  except:
+    - /[0-9]*\.[0-9]*\.[0-9]*/
+before_install:
+  - sudo apt-get install jq
+
+jobs:
+  include:
+    - stage: "test and build"
+      name: "Run tests"
+      script:
+      - (curl -s https://raw.githubusercontent.com/edenlabllc/ci-utils/umbrella_v2/tests.sh -o tests.sh; bash ./tests.sh) || travis_terminate 1
+
+    - stage: "test and build"
+      name: "Build Docker containers. EDR API"
+      env:
+        - APPS='[{"app":"edr_api","chart":"edr-api","namespace":"edr","deployment":"api-edr","label":"api-edr"}]'
+      # "Decrypting deploy key..."
+      script:
+      - openssl aes-256-cbc -K $encrypted_a2a85018fd7a_key -iv $encrypted_a2a85018fd7a_iv -in eHealth-8110bd102a69.json.enc -out eHealth-8110bd102a69.json -d
+      - (curl -s https://raw.githubusercontent.com/edenlabllc/ci-utils/umbrella_v2/docker.sh -o docker.sh; bash ./docker.sh) || travis_terminate 1

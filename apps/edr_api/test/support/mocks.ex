@@ -1,1 +1,1 @@
-Mox.defmock(EdrApiMock, for: EdrApi.API.EDRBehaviour)
+Mox.defmock(EdrApiMock, for: EdrApi.API.EdrBehaviour)

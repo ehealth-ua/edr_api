@@ -1,4 +1,4 @@
-defmodule EdrApi.API.EDRBehaviour do
+defmodule EdrApi.API.EdrBehaviour do
   @moduledoc false
 
   alias HTTPoison.Error
