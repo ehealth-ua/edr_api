@@ -50,7 +50,9 @@ defmodule EdrApiTest do
 
     test "invalid response body: empty list" do
       edr_api_expectation(:search_legal_entity, [], 200)
-      assert {:error, "EDR not found"} = Rpc.legal_entity_by_code("11111111")
+
+      assert {:error, %{"body" => "Legal entity not found", "status_code" => 404}} =
+               Rpc.legal_entity_by_code("11111111")
     end
 
     test "invalid response body: list with more than one item" do
@@ -77,7 +79,8 @@ defmodule EdrApiTest do
         200
       )
 
-      assert {:error, "Too many EDR found"} = Rpc.legal_entity_by_code("11111111")
+      assert {:error, %{"body" => "Too many legal entities found", "status_code" => 404}} =
+               Rpc.legal_entity_by_code("11111111")
     end
 
     test "error response" do
@@ -149,7 +152,9 @@ defmodule EdrApiTest do
     test "invalid response body: empty list" do
       edr_api_search_legal_entity_expectation()
       edr_api_expectation(:legal_entity_detailed_info, [], 200)
-      assert {:error, "EDR not found"} = Rpc.legal_entity_by_passport("АА111111")
+
+      assert {:error, %{"body" => "Legal entity not found", "status_code" => 404}} =
+               Rpc.legal_entity_by_passport("АА111111")
     end
 
     test "invalid response body: list with more than one item" do
@@ -178,7 +183,8 @@ defmodule EdrApiTest do
         200
       )
 
-      assert {:error, "Too many EDR found"} = Rpc.legal_entity_by_passport("АА111111")
+      assert {:error, %{"body" => "Too many legal entities found", "status_code" => 404}} =
+               Rpc.legal_entity_by_passport("АА111111")
     end
 
     test "error response" do

@@ -50,10 +50,12 @@ defmodule EdrApi.Validator do
     {:error, %{"status_code" => status_code, "body" => body}}
   end
 
-  defp validate_body([]), do: {:error, "EDR not found"}
+  defp validate_body([]) do
+    {:error, %{"status_code" => 404, "body" => "Legal entity not found"}}
+  end
 
   defp validate_body(body) when is_list(body) and length(body) > 1 do
-    {:error, "Too many EDR found"}
+    {:error, %{"status_code" => 404, "body" => "Too many legal entities found"}}
   end
 
   defp validate_body([body]), do: validate_body(body)
