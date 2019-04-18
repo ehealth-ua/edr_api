@@ -55,7 +55,15 @@ defmodule EdrApi.Validator do
   end
 
   defp validate_body(body) when is_list(body) and length(body) > 1 do
-    {:error, %{"status_code" => 400, "body" => "Too many legal entities found"}}
+    active_items = Enum.filter(body, &(Map.get(&1, "state") == 1))
+
+    case Enum.count(active_items) do
+      1 ->
+        {:ok, active_items}
+
+      _ ->
+        {:error, %{"status_code" => 400, "body" => "Too many legal entities found"}}
+    end
   end
 
   defp validate_body([body]), do: validate_body(body)
