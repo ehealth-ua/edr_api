@@ -1,4 +1,6 @@
 defmodule EdrApiTest do
+  @moduledoc false
+
   use ExUnit.Case
   import Mox
 
