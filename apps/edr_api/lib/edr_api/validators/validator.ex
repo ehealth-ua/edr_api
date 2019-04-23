@@ -5,6 +5,15 @@ defmodule EdrApi.Validator do
 
   require Logger
 
+  def validate_params(params) do
+    with :ok <- validate_passport(Map.get(params, :passport)),
+         :ok <- validate_code(Map.get(params, :code)) do
+      :ok
+    end
+  end
+
+  def validate_code(nil), do: :ok
+
   def validate_code(value) when is_binary(value) do
     if Regex.match?(~r/^[0-9]{8,10}|[0-9]{9,10}$/, value) do
       :ok
@@ -21,6 +30,8 @@ defmodule EdrApi.Validator do
     Logger.error("Invalid request params (code request param should be a binary): #{value}")
     {:error, "code request param should be a binary"}
   end
+
+  def validate_passport(nil), do: :ok
 
   def validate_passport(value) when is_binary(value) do
     if Regex.match?(~r/^((?![ЫЪЭЁ])([А-ЯҐЇІЄ])){2}[0-9]{6}$/u, value) do
@@ -39,35 +50,13 @@ defmodule EdrApi.Validator do
     {:error, "passport request param should be a binary"}
   end
 
+  def validate_response(%{status_code: 200, body: ""}), do: {:ok, []}
+
   def validate_response(%{status_code: 200, body: body}) do
-    case validate_body(body) do
-      {:ok, body} -> {:ok, body}
-      error -> error
-    end
+    {:ok, body}
   end
 
   def validate_response(%{status_code: status_code, body: body}) do
     {:error, %{"status_code" => status_code, "body" => body}}
   end
-
-  defp validate_body([]) do
-    {:error, %{"status_code" => 400, "body" => "Legal entity not found"}}
-  end
-
-  defp validate_body(body) when is_list(body) and length(body) > 1 do
-    active_items = Enum.filter(body, &(Map.get(&1, "state") == 1))
-
-    case Enum.count(active_items) do
-      1 ->
-        {:ok, active_items}
-
-      _ ->
-        {:error, %{"status_code" => 400, "body" => "Too many legal entities found"}}
-    end
-  end
-
-  defp validate_body([body]), do: validate_body(body)
-  defp validate_body(body) when is_map(body), do: {:ok, body}
-  defp validate_body(""), do: {:error, "Invalid response body"}
-  defp validate_body(body), do: {:error, "Response body parse error: #{body}"}
 end

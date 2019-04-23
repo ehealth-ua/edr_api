@@ -28,14 +28,16 @@ defmodule EdrApi.RpcTest do
       end)
 
       assert {:ok,
-              %{
-                "id" => 123_456,
-                "name" => "TEST",
-                "passport" => "АА111111",
-                "state" => 1,
-                "state_text" => "зареєстровано",
-                "url" => "https://example.com"
-              }} = Rpc.search_legal_entity(%{passport: "ББ000000"})
+              [
+                %{
+                  "id" => 123_456,
+                  "name" => "TEST",
+                  "passport" => "АА111111",
+                  "state" => 1,
+                  "state_text" => "зареєстровано",
+                  "url" => "https://example.com"
+                }
+              ]} = Rpc.search_legal_entity(%{passport: "ББ000000"})
     end
 
     test "search by edrpou" do
@@ -57,14 +59,26 @@ defmodule EdrApi.RpcTest do
       end)
 
       assert {:ok,
-              %{
-                "id" => 123_456,
-                "name" => "TEST",
-                "passport" => "АА111111",
-                "state" => 1,
-                "state_text" => "зареєстровано",
-                "url" => "https://example.com"
-              }} = Rpc.search_legal_entity(%{code: "00000000"})
+              [
+                %{
+                  "id" => 123_456,
+                  "name" => "TEST",
+                  "passport" => "АА111111",
+                  "state" => 1,
+                  "state_text" => "зареєстровано",
+                  "url" => "https://example.com"
+                }
+              ]} = Rpc.search_legal_entity(%{code: "00000000"})
+    end
+
+    test "invalid passport" do
+      assert {:error, "passport request param should match '^((?![ЫЪЭЁ])([А-ЯҐЇІЄ])){2}[0-9]{6}$' reg exp"} =
+               Rpc.search_legal_entity(%{passport: "invalid"})
+    end
+
+    test "invalid code" do
+      assert {:error, "code request param should match '^[0-9]{8,10}|[0-9]{9,10}$' reg exp"} =
+               Rpc.search_legal_entity(%{code: "invalid"})
     end
   end
 
