@@ -5,16 +5,24 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
-## [0.0.1](https://github.com/edenlabllc/edr_api/compare/0.0.1...0.0.1) (2019-3-27)
+## [0.0.1](https://github.com/edenlabllc/edr_api/compare/0.0.1...0.0.1) (2019-5-9)
 
 
 
 
 ### Features:
 
+* refactor edr rpc (#13)
+
+* get legal entity defailt info rpc (#12)
+
 * Json validation added (#1)
 
 ### Bug Fixes:
+
+* edr improvements on list items (#11)
+
+* edr status code response (#8)
 
 * Fix naming (#6)
 
